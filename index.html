@@ -36,6 +36,12 @@
       }
     }
 
+    .GSC-HR {
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+    }
+
     .overlay {
       position: fixed;
       top: 0;
@@ -159,7 +165,9 @@
   <div class="overlay">
     <div class="popup">
       <h2>👋 Welcome to Our Store!</h2>
-      <p>We are currently working hard on building something amazing for you.</p>
+      <p>We are currently working hard on building something amazing for you
+        <a class="GSC-HR" href="/GSC-Hr/index.html">.</a>
+      </p>
       <div class="construction-text" id="constructionText">🚧 Under Construction</div>
       <div class="countdown" id="countdown">
         <span id="days">00</span> :
@@ -186,7 +194,7 @@
       seconds: document.getElementById('seconds')
     };
 
-    const launchDate = new Date('august 14, 2025 12:00:00').getTime();
+    const launchDate = new Date('January 01, 2026 12:00:00').getTime();
 
     function updateCountdown() {
       const now = new Date().getTime();

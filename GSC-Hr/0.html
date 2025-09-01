@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin System</title>
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+    }
+
+    /* ---------------- Login Page ---------------- */
+    #login-page {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      z-index: 10;
+      opacity: 1;
+      transition: opacity 0.8s;
+    }
+
+    .login-container {
+      width: 350px;
+      padding: 40px 30px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      color: #fff;
+    }
+
+    .login-container h2 {
+      margin-bottom: 25px;
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .input-box {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .input-box input {
+      width: 100%;
+      padding: 12px 45px 12px 15px;
+      border: none;
+      border-radius: 10px;
+      outline: none;
+      font-size: 16px;
+      color: black;
+    }
+
+    .input-box input.invalid {
+      outline: 4px solid red;
+    }
+
+    .toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 15px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 16px;
+      color: black;
+    }
+
+    .login-container button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 25px;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .login-container button:hover {
+      transform: scale(1.05);
+    }
+
+    .error,
+    .success {
+      margin-top: 15px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .error {
+      color: yellow;
+    }
+
+    .success {
+      color: #00ff99;
+    }
+
+    /* Fade animations */
+    .fade-out {
+      animation: fadeOut 0.8s forwards;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.8s forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* ---------------- Admin Panel ---------------- */
+    #admin-panel {
+      display: none;
+      width: 100%;
+      height: 100%;
+      opacity: 1;
+      transition: opacity 0.8s;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #1e1e2d;
+      color: white;
+      height: 100vh;
+      padding-top: 20px;
+      float: left;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 20px;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar ul li {
+      padding: 15px 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .sidebar ul li:hover,
+    .sidebar ul li.active {
+      background: #2575fc;
+    }
+
+    .sidebar ul li span {
+      margin-left: 10px;
+    }
+
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+    }
+
+    .topbar {
+      background: #fff;
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    @media(max-width:768px) {
+      .sidebar {
+        width: 70px;
+      }
+
+      .sidebar h2,
+      .sidebar ul li span {
+        display: none;
+      }
+
+      .main-content {
+        margin-left: 70px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Login Page -->
+  <div id="login-page">
+    <div class="login-container">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <div class="input-box">
+          <input type="text" id="username" placeholder="Username" required>
+          <p class="input-error" id="usernameError"
+            style="display:none;color:yellow;font-size:13px;margin:5px 0 0 5px;">
+            Invalid Username</p>
+        </div>
+        <div class="input-box">
+          <input type="password" id="password" placeholder="Password" required>
+          <span class="toggle-password" id="togglePassword">👁</span>
+          <p class="input-error" id="passwordError"
+            style="display:none;color:yellow;font-size:13px;margin:5px 0 0 5px;">
+            Incorrect Password</p>
+        </div>
+        <button type="submit">Login</button>
+        <p class="error" id="errorMsg">❌ Invalid username or password</p>
+        <p class="success" id="successMsg">✅ Login successful!</p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div id="admin-panel">
+    <div class="sidebar">
+      <h2>Admin Panel</h2>
+      <ul id="menu">
+        <li class="active" data-page="employee">👨‍💼 <span>Employee</span></li>
+        <li data-page="attendance">📅 <span>Attendance</span></li>
+        <li data-page="fines">💰 <span>Fines</span></li>
+        <li data-page="penalties">⚖️ <span>Penalties</span></li>
+        <li data-page="advances">💳 <span>Advances</span></li>
+        <li data-page="loans">🏦 <span>Loans</span></li>
+        <li data-page="payroll">🧾 <span>Payroll</span></li>
+      </ul>
+    </div>
+    <div class="main-content">
+      <div class="topbar">
+        <h2 id="page-title">Employee</h2>
+        <p>Welcome, Admin</p>
+      </div>
+      <div id="content">
+        <div class="card">This is the Employee section.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Elements
+    const loginPage = document.getElementById("login-page");
+    const adminPanel = document.getElementById("admin-panel");
+    const loginForm = document.getElementById("loginForm");
+    const errorMsg = document.getElementById("errorMsg");
+    const successMsg = document.getElementById("successMsg");
+    const passwordField = document.getElementById("password");
+    const togglePassword = document.getElementById("togglePassword");
+
+    // Toggle password visibility
+    togglePassword.addEventListener("click", () => {
+      if (passwordField.type === "password") {
+        passwordField.type = "text";
+        togglePassword.textContent = "🙈";
+      } else {
+        passwordField.type = "password";
+        togglePassword.textContent = "👁";
+      }
+    });
+
+    // Login Validation with animation
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const usernameInput = document.getElementById("username");
+      const passwordInput = document.getElementById("password");
+      const usernameError = document.getElementById("usernameError");
+      const passwordError = document.getElementById("passwordError");
+
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      // Reset errors and outlines
+      usernameInput.classList.remove("invalid");
+      passwordInput.classList.remove("invalid");
+      usernameError.style.display = "none";
+      passwordError.style.display = "none";
+      errorMsg.style.display = "none";
+      successMsg.style.display = "none";
+
+      let hasError = false;
+
+      if (username !== "admin") {
+        usernameInput.classList.add("invalid");
+        usernameError.style.display = "block";
+        hasError = true;
+      }
+      if (password !== "1234") {
+        passwordInput.classList.add("invalid");
+        passwordError.style.display = "block";
+        hasError = true;
+      }
+
+      if (!hasError) {
+        successMsg.style.display = "block";
+        loginPage.classList.add("fade-out");
+        setTimeout(() => {
+          loginPage.style.display = "none";
+          adminPanel.style.display = "block";
+          adminPanel.classList.add("fade-in");
+          setTimeout(() => {
+            adminPanel.classList.remove("fade-in");
+            loginPage.classList.remove("fade-out");
+          }, 800);
+        }, 800);
+      }
+    });
+
+    // Admin Panel Navigation
+    const menuItems = document.querySelectorAll("#menu li");
+    const pageTitle = document.getElementById("page-title");
+    const content = document.getElementById("content");
+
+    const pages = {
+      employee: "This is the Employee section.",
+      attendance: "Track and manage attendance records.",
+      fines: "Manage fines and payments.",
+      penalties: "View and update penalties.",
+      advances: "Record employee advances.",
+      loans: "Manage employee loans.",
+      payroll: "Generate and review payroll."
+    };
+
+    menuItems.forEach(item => {
+      item.addEventListener("click", () => {
+        document.querySelector("#menu li.active").classList.remove("active");
+        item.classList.add("active");
+
+        const page = item.getAttribute("data-page");
+        pageTitle.textContent = page.charAt(0).toUpperCase() + page.slice(1);
+        content.innerHTML = `<div class="card">${pages[page]}</div>
