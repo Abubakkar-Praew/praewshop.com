@@ -22,6 +22,11 @@
       background: linear-gradient(135deg, #6a11cb, #2575fc);
     }
 
+    /* Remove background when admin panel is visible */
+    body.admin-active {
+      background: #f4f6fb;
+    }
+
     /* ---------------- Login Page ---------------- */
     #login-page {
       position: absolute;
@@ -32,8 +37,6 @@
       align-items: center;
       background: linear-gradient(135deg, #6a11cb, #2575fc);
       z-index: 10;
-      opacity: 1;
-      transition: opacity 0.8s;
     }
 
     .login-container {
@@ -66,6 +69,7 @@
       outline: none;
       font-size: 16px;
       color: black;
+      /* Remove forced color */
     }
 
     .input-box input.invalid {
@@ -113,39 +117,11 @@
       color: #00ff99;
     }
 
-    /* Fade animations */
-    .fade-out {
-      animation: fadeOut 0.8s forwards;
-    }
-
-    .fade-in {
-      animation: fadeIn 0.8s forwards;
-    }
-
-    @keyframes fadeOut {
-      to {
-        opacity: 0;
-        visibility: hidden;
-      }
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-
-      to {
-        opacity: 1;
-      }
-    }
-
     /* ---------------- Admin Panel ---------------- */
     #admin-panel {
       display: none;
       width: 100%;
       height: 100%;
-      opacity: 1;
-      transition: opacity 0.8s;
     }
 
     .sidebar {
@@ -155,6 +131,8 @@
       height: 100vh;
       padding-top: 20px;
       float: left;
+      position: relative;
+      /* Add for absolute positioning children */
     }
 
     .sidebar h2 {
@@ -168,19 +146,25 @@
     }
 
     .sidebar ul li {
-      padding: 15px 20px;
-      cursor: pointer;
+      padding-top: 15px;
+      padding-bottom: 15px;
       transition: 0.3s;
-    }
-
-    .sidebar ul li:hover,
-    .sidebar ul li.active {
-      background: #2575fc;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .sidebar ul li span {
       margin-left: 10px;
+      cursor: pointer;
     }
+
+    .sidebar ul li span:hover {
+      border-bottom: 2px solid white;
+    }
+
+    /* .sidebar ul li.active {
+      background: #2575fc;
+      cursor: pointer;
+    } */
 
     .main-content {
       margin-left: 250px;
@@ -206,9 +190,43 @@
       box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     }
 
+    .fade-out {
+      animation: fadeOut 0.8s forwards;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.8s forwards;
+    }
+
+    .fade-content-out {
+      animation: fadeOut 0.4s forwards;
+    }
+
+    .fade-content-in {
+      animation: fadeIn 0.4s;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
     @media(max-width:768px) {
       .sidebar {
         width: 70px;
+        min-width: 70px;
       }
 
       .sidebar h2,
@@ -219,13 +237,190 @@
       .main-content {
         margin-left: 70px;
       }
+
+      .logout-btn .text {
+        display: none;
+      }
+    }
+
+    /* Department Selection */
+    #department-select {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      z-index: 20;
+    }
+
+    .department-container {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      color: #fff;
+    }
+
+    .department-container h2 {
+      margin-bottom: 25px;
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .department-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .department-btn {
+      padding: 15px 40px;
+      border: none;
+      border-radius: 25px;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .department-btn:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #2575fc, #6a11cb);
+    }
+
+    .sub-menu {
+      display: none;
+      margin-top: 10px;
+      padding-top: 10px;
+    }
+
+    li.show-sub>.sub-menu {
+      display: block;
+    }
+
+    .sub-menu .sub-btn {
+      padding: 10px 30px;
+      cursor: pointer;
+      background: #1e1e2d;
+      color: #fff;
+      font-size: 15px;
+      transition: background 0.2s;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+    }
+
+    .sub-menu .sub-btn:hover {
+      background: #2575fc;
+    }
+
+    .sub-menu .sub-btn.active {
+      background: #2575fc;
+      color: #fff;
+    }
+
+    /* Modern Clock Styles */
+    .modern-clock {
+      font-size: 22px;
+      font-weight: 600;
+      color: #2575fc;
+      letter-spacing: 2px;
+      margin-top: 8px;
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 18px;
+      display: inline-block;
+      box-shadow: 0 2px 8px rgba(37, 117, 252, 0.08);
+      animation: clockPulse 1s infinite alternate;
+    }
+
+    @keyframes clockPulse {
+      0% {
+        box-shadow: 0 2px 8px rgba(37, 117, 252, 0.08);
+      }
+
+      100% {
+        box-shadow: 0 4px 16px rgba(37, 117, 252, 0.18);
+      }
+    }
+
+    /* Logout Button Styles */
+    .logout-btn {
+      position: absolute;
+      left: 20px;
+      bottom: 30px;
+      width: 54px;
+      height: 54px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 4px 16px rgba(240, 152, 25, 0.18);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, background 0.2s;
+      z-index: 2;
+    }
+
+    .logout-btn:hover {
+      transform: scale(1.08);
+      background: #f09819;
+    }
+
+    .logout-btn:active {
+      transform: scale(0.98);
+    }
+
+    .logout-btn .logout-img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Responsive for sidebar and button */
+    @media(max-width:768px) {
+      .sidebar {
+        width: 70px;
+        min-width: 70px;
+      }
+
+      .logout-btn {
+        left: 8px;
+        bottom: 16px;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+      }
+
+      .logout-btn .logout-img {
+        width: 24px;
+        height: 24px;
+      }
     }
   </style>
 </head>
 
 <body>
+  <!-- Department Selection Page -->
+  <div id="department-select">
+    <div class="department-container">
+      <h2>Select Department</h2>
+      <div class="department-list">
+        <button class="department-btn" data-dept="admin">Admin</button>
+        <button class="department-btn" data-dept="counsellors">Counsellors</button>
+        <button class="department-btn" data-dept="hr">HR</button>
+        <button class="department-btn" data-dept="operation">Operation Team</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Login Page -->
-  <div id="login-page">
+  <div id="login-page" style="display:none;">
     <div class="login-container">
       <h2>Login</h2>
       <form id="loginForm">
@@ -250,32 +445,46 @@
   </div>
 
   <!-- Admin Panel -->
-  <div id="admin-panel">
+  <div id="admin-panel" style="display:none;">
     <div class="sidebar">
       <h2>Admin Panel</h2>
       <ul id="menu">
-        <li class="active" data-page="employee">👨‍💼 <span>Employee</span></li>
-        <li data-page="attendance">📅 <span>Attendance</span></li>
-        <li data-page="fines">💰 <span>Fines</span></li>
-        <li data-page="penalties">⚖️ <span>Penalties</span></li>
-        <li data-page="advances">💳 <span>Advances</span></li>
-        <li data-page="loans">🏦 <span>Loans</span></li>
-        <li data-page="payroll">🧾 <span>Payroll</span></li>
+        <li class="active" data-page="hr-record">🧑‍💼 <span>HR Record</span>
+          <ul class="sub-menu">
+            <li class="sub-btn" data-page="employee">👨‍💼 Employee</li>
+            <li class="sub-btn" data-page="attendance">📅 Attendance</li>
+            <li class="sub-btn" data-page="fines">💰 Fines</li>
+            <li class="sub-btn" data-page="penalties">⚖️ Penalties</li>
+            <li class="sub-btn" data-page="advances">💳 Advances</li>
+            <li class="sub-btn" data-page="loans">🏦 Loans</li>
+            <li class="sub-btn" data-page="payroll">🧾 Payroll</li>
+          </ul>
+        </li>
+        <li data-page="admin-record">🛡️ <span>Admin Record</span></li>
+        <li data-page="counsellor-record">🎓 <span>Counsellor Record</span></li>
+        <li data-page="operation-record">⚙️ <span>Operation Record</span></li>
       </ul>
+      <button id="logout-btn" class="logout-btn">
+        <img src="logout.png" alt="Logout" class="logout-img" />
+      </button>
     </div>
     <div class="main-content">
       <div class="topbar">
-        <h2 id="page-title">Employee</h2>
-        <p>Welcome, Admin</p>
+        <h2 id="page-title">HR Record</h2>
+        <div>
+          <p>Welcome, Admin</p>
+          <div id="clock" class="modern-clock"></div>
+        </div>
       </div>
       <div id="content">
-        <div class="card">This is the Employee section.</div>
+        <div class="card"></div>
       </div>
     </div>
   </div>
 
   <script>
     // Elements
+    const departmentSelect = document.getElementById("department-select");
     const loginPage = document.getElementById("login-page");
     const adminPanel = document.getElementById("admin-panel");
     const loginForm = document.getElementById("loginForm");
@@ -283,6 +492,20 @@
     const successMsg = document.getElementById("successMsg");
     const passwordField = document.getElementById("password");
     const togglePassword = document.getElementById("togglePassword");
+
+    // Department selection logic
+    document.querySelectorAll('.department-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dept = btn.getAttribute('data-dept');
+        departmentSelect.style.display = 'none';
+        if (dept === 'admin') {
+          loginPage.style.display = 'flex';
+        } else {
+          alert('Only Admin panel is available in this demo.');
+          departmentSelect.style.display = 'flex';
+        }
+      });
+    });
 
     // Toggle password visibility
     togglePassword.addEventListener("click", () => {
@@ -295,7 +518,7 @@
       }
     });
 
-    // Login Validation with animation
+    // Login Validation
     loginForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const usernameInput = document.getElementById("username");
@@ -333,6 +556,7 @@
         setTimeout(() => {
           loginPage.style.display = "none";
           adminPanel.style.display = "block";
+          document.body.classList.add("admin-active");
           adminPanel.classList.add("fade-in");
           setTimeout(() => {
             adminPanel.classList.remove("fade-in");
@@ -348,20 +572,115 @@
     const content = document.getElementById("content");
 
     const pages = {
-      employee: "This is the Employee section.",
-      attendance: "Track and manage attendance records.",
-      fines: "Manage fines and payments.",
-      penalties: "View and update penalties.",
-      advances: "Record employee advances.",
-      loans: "Manage employee loans.",
-      payroll: "Generate and review payroll."
+      "hr-record": "",
+      "admin-record": "",
+      "counsellor-record": "",
+      "operation-record": "",
+      "employee": "Employee Record Content",
+      "attendance": "Attendance Record Content",
+      "fines": "Fines Record Content",
+      "penalties": "Penalties Record Content",
+      "advances": "Advances Record Content",
+      "loans": "Loans Record Content",
+      "payroll": "Payroll Record Content"
     };
 
+    // Main menu navigation
     menuItems.forEach(item => {
       item.addEventListener("click", () => {
-        document.querySelector("#menu li.active").classList.remove("active");
+        // Remove active from all main menu items
+        menuItems.forEach(i => i.classList.remove("active", "show-sub"));
+        // Remove active from all sub-menu items
+        document.querySelectorAll(".sub-btn.active").forEach(btn => btn.classList.remove("active"));
+
         item.classList.add("active");
 
         const page = item.getAttribute("data-page");
-        pageTitle.textContent = page.charAt(0).toUpperCase() + page.slice(1);
-        content.innerHTML = `<div class="card">${pages[page]}</div>
+
+        // If HR Record, show sub-menu
+        if (page === "hr-record") {
+          item.classList.add("show-sub");
+        }
+
+        // Set dynamic page title
+        let title = "";
+        if (page === "hr-record") title = "HR Record Dashboard";
+        else if (page === "admin-record") title = "Admin Dashboard";
+        else if (page === "counsellor-record") title = "Counsellor Dashboard";
+        else if (page === "operation-record") title = "Operation Team Dashboard";
+
+        // Fade out current content
+        content.classList.add("fade-content-out");
+        setTimeout(() => {
+          pageTitle.textContent = title;
+          content.innerHTML = `<div class="card">${pages[page]}</div>`;
+          content.classList.remove("fade-content-out");
+          content.classList.add("fade-content-in");
+          setTimeout(() => {
+            content.classList.remove("fade-content-in");
+          }, 400);
+        }, 400);
+      });
+    });
+
+    // Sub-menu navigation
+    document.querySelectorAll(".sub-btn").forEach(subBtn => {
+      subBtn.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent parent li click
+
+        // Remove active from all sub-menu items
+        document.querySelectorAll(".sub-btn.active").forEach(btn => btn.classList.remove("active"));
+        subBtn.classList.add("active");
+
+        // Remove active from all main menu items except HR Record
+        menuItems.forEach(i => {
+          if (i.getAttribute("data-page") === "hr-record") {
+            i.classList.add("active", "show-sub");
+          } else {
+            i.classList.remove("active", "show-sub");
+          }
+        });
+
+        // Set dynamic page title for sub-menu
+        let subPage = subBtn.getAttribute("data-page");
+        let title = "";
+        if (subPage === "employee") title = "Employee";
+        else if (subPage === "attendance") title = "Attendance";
+        else if (subPage === "fines") title = "Fines";
+        else if (subPage === "penalties") title = "Penalties";
+        else if (subPage === "advances") title = "Advances";
+        else if (subPage === "loans") title = "Loans";
+        else if (subPage === "payroll") title = "Payroll";
+
+        // Fade out current content
+        content.classList.add("fade-content-out");
+        setTimeout(() => {
+          pageTitle.textContent = title;
+          content.innerHTML = `<div class="card">${pages[subPage]}</div>`;
+          content.classList.remove("fade-content-out");
+          content.classList.add("fade-content-in");
+          setTimeout(() => {
+            content.classList.remove("fade-content-in");
+          }, 400);
+        }, 400);
+      });
+    });
+
+    // Clock logic
+    function updateClock() {
+      const clock = document.getElementById("clock");
+      if (clock) {
+        const now = new Date();
+        // Show HH:MM:SS with leading zeros
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const s = String(now.getSeconds()).padStart(2, '0');
+        clock.textContent = `${h}:${m}:${s}`;
+      }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+</body>
+
+</html>
