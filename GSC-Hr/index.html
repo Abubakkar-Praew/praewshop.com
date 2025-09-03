@@ -132,7 +132,9 @@
       padding-top: 20px;
       float: left;
       position: relative;
-      /* Add for absolute positioning children */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
     }
 
     .sidebar h2 {
@@ -182,6 +184,29 @@
       align-items: center;
     }
 
+    .topbar-right {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .welcome-clock {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .welcome-admin {
+      font-size: 15px;
+      font-weight: 500;
+      color: #000;
+      /* Black color */
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
     .card {
       background: #fff;
       padding: 20px;
@@ -229,17 +254,15 @@
         min-width: 70px;
       }
 
-      .sidebar h2,
-      .sidebar ul li span {
-        display: none;
+      .logout-btn {
+        width: 44px;
+        height: 44px;
+        margin-bottom: 16px;
       }
 
-      .main-content {
-        margin-left: 70px;
-      }
-
-      .logout-btn .text {
-        display: none;
+      .logout-btn .logout-img {
+        width: 24px;
+        height: 24px;
       }
     }
 
@@ -323,34 +346,31 @@
 
     /* Modern Clock Styles */
     .modern-clock {
-      font-size: 22px;
-      font-weight: 600;
-      color: #2575fc;
-      letter-spacing: 2px;
-      margin-top: 8px;
-      background: #fff;
-      border-radius: 8px;
-      padding: 8px 18px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #000;
+      /* Black color */
+      letter-spacing: 1px;
+      background: none;
+      /* Remove background */
+      border-radius: 0;
+      /* Remove border radius */
+      padding: 0;
+      /* Remove padding */
+      box-shadow: none;
+      /* Remove shadow */
       display: inline-block;
-      box-shadow: 0 2px 8px rgba(37, 117, 252, 0.08);
-      animation: clockPulse 1s infinite alternate;
-    }
-
-    @keyframes clockPulse {
-      0% {
-        box-shadow: 0 2px 8px rgba(37, 117, 252, 0.08);
-      }
-
-      100% {
-        box-shadow: 0 4px 16px rgba(37, 117, 252, 0.18);
-      }
+      text-align: center;
+      animation: none;
+      /* Remove animation */
     }
 
     /* Logout Button Styles */
     .logout-btn {
-      position: absolute;
-      left: 20px;
-      bottom: 30px;
+      margin-top: auto;
+      margin-bottom: 30px;
+      align-self: center;
+      position: static;
       width: 54px;
       height: 54px;
       padding: 0;
@@ -390,11 +410,9 @@
       }
 
       .logout-btn {
-        left: 8px;
-        bottom: 16px;
         width: 44px;
         height: 44px;
-        padding: 0;
+        margin-bottom: 16px;
       }
 
       .logout-btn .logout-img {
@@ -471,9 +489,11 @@
     <div class="main-content">
       <div class="topbar">
         <h2 id="page-title">HR Record</h2>
-        <div>
-          <p>Welcome, Admin</p>
-          <div id="clock" class="modern-clock"></div>
+        <div class="topbar-right">
+          <div class="welcome-clock">
+            <p class="welcome-admin">Welcome, Admin</p>
+            <div id="clock" class="modern-clock"></div>
+          </div>
         </div>
       </div>
       <div id="content">
@@ -671,11 +691,20 @@
       const clock = document.getElementById("clock");
       if (clock) {
         const now = new Date();
-        // Show HH:MM:SS with leading zeros
-        const h = String(now.getHours()).padStart(2, '0');
-        const m = String(now.getMinutes()).padStart(2, '0');
-        const s = String(now.getSeconds()).padStart(2, '0');
-        clock.textContent = `${h}:${m}:${s}`;
+        // Format time in 12-hour format with AM/PM
+        let hours = now.getHours();
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // 0 should be 12
+        const timeStr = `${hours}:${minutes}:${seconds} ${ampm}`;
+
+        // Format date as Month Day, Year (e.g., Sep 3, 2025)
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        const dateStr = now.toLocaleDateString(undefined, options);
+
+        clock.textContent = `${dateStr} | ${timeStr}`;
       }
     }
     setInterval(updateClock, 1000);

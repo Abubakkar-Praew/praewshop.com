@@ -132,7 +132,9 @@
       padding-top: 20px;
       float: left;
       position: relative;
-      /* Add for absolute positioning children */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
     }
 
     .sidebar h2 {
@@ -182,6 +184,29 @@
       align-items: center;
     }
 
+    .topbar-right {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .welcome-clock {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .welcome-admin {
+      font-size: 15px;
+      font-weight: 500;
+      color: #000;
+      /* Black color */
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
     .card {
       background: #fff;
       padding: 20px;
@@ -229,17 +254,15 @@
         min-width: 70px;
       }
 
-      .sidebar h2,
-      .sidebar ul li span {
-        display: none;
+      .logout-btn {
+        width: 44px;
+        height: 44px;
+        margin-bottom: 16px;
       }
 
-      .main-content {
-        margin-left: 70px;
-      }
-
-      .logout-btn .text {
-        display: none;
+      .logout-btn .logout-img {
+        width: 24px;
+        height: 24px;
       }
     }
 
@@ -323,34 +346,31 @@
 
     /* Modern Clock Styles */
     .modern-clock {
-      font-size: 22px;
-      font-weight: 600;
-      color: #2575fc;
-      letter-spacing: 2px;
-      margin-top: 8px;
-      background: #fff;
-      border-radius: 8px;
-      padding: 8px 18px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #000;
+      /* Black color */
+      letter-spacing: 1px;
+      background: none;
+      /* Remove background */
+      border-radius: 0;
+      /* Remove border radius */
+      padding: 0;
+      /* Remove padding */
+      box-shadow: none;
+      /* Remove shadow */
       display: inline-block;
-      box-shadow: 0 2px 8px rgba(37, 117, 252, 0.08);
-      animation: clockPulse 1s infinite alternate;
-    }
-
-    @keyframes clockPulse {
-      0% {
-        box-shadow: 0 2px 8px rgba(37, 117, 252, 0.08);
-      }
-
-      100% {
-        box-shadow: 0 4px 16px rgba(37, 117, 252, 0.18);
-      }
+      text-align: center;
+      animation: none;
+      /* Remove animation */
     }
 
     /* Logout Button Styles */
     .logout-btn {
-      position: absolute;
-      left: 20px;
-      bottom: 30px;
+      margin-top: auto;
+      margin-bottom: 30px;
+      align-self: center;
+      position: static;
       width: 54px;
       height: 54px;
       padding: 0;
@@ -382,24 +402,174 @@
       display: block;
     }
 
-    /* Responsive for sidebar and button */
-    @media(max-width:768px) {
-      .sidebar {
-        width: 70px;
-        min-width: 70px;
+    /* Employee Page Styles */
+    .employee-page {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .employee-header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .add-employee-btn {
+      background: linear-gradient(135deg, #2575fc, #6a11cb);
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      padding: 10px 28px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .add-employee-btn:hover {
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      transform: scale(1.05);
+    }
+
+    .employee-search {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px 16px;
+      border-radius: 20px;
+      border: 1px solid #2575fc;
+      font-size: 15px;
+    }
+
+    .employee-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-top: 10px;
+    }
+
+    .employee-card {
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 2px 8px rgba(37, 117, 252, 0.08);
+      padding: 18px 22px;
+      min-width: 260px;
+      flex: 1 1 260px;
+      font-size: 15px;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .employee-card strong {
+      color: #2575fc;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .modal-content {
+      background: #fff;
+      border-radius: 16px;
+      padding: 30px 28px;
+      width: 95vw;
+      /* 80% of viewport width */
+      max-width: 950px;
+      /* Optional: limit max width */
+      position: relative;
+      box-shadow: 0 8px 32px rgba(37, 117, 252, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      height: auto;
+      /* Height fits content */
+      max-height: 90vh;
+      /* Prevent overflow on very small screens */
+      overflow-y: auto;
+      /* Scroll if content is too tall */
+    }
+
+    .modal-content h3 {
+      margin-bottom: 10px;
+      color: #2575fc;
+      text-align: center;
+    }
+
+    .modal-content input,
+    .modal-content select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border: 1px solid #2575fc;
+      font-size: 15px;
+    }
+
+    .modal-content button[type="submit"] {
+      background: linear-gradient(135deg, #2575fc, #6a11cb);
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 1rem 24px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .modal-content button[type="submit"]:hover {
+      background: linear-gradient(135deg, #6611c1, #2167e0);
+      transform: scale(1.03);
+    }
+
+    .close {
+      position: absolute;
+      top: 12px;
+      right: 18px;
+      font-size: 22px;
+      color: #2575fc;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .employee-page {
+        max-width: 100%;
       }
 
-      .logout-btn {
-        left: 8px;
-        bottom: 16px;
-        width: 44px;
-        height: 44px;
-        padding: 0;
+      .employee-header {
+        flex-direction: column;
+        gap: 10px;
       }
 
-      .logout-btn .logout-img {
-        width: 24px;
-        height: 24px;
+      .employee-list {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .employee-card {
+        min-width: 0;
+      }
+
+      .modal-content {
+        width: 98vw;
+        max-width: 98vw;
+        padding: 18px 6px;
       }
     }
   </style>
@@ -471,9 +641,11 @@
     <div class="main-content">
       <div class="topbar">
         <h2 id="page-title">HR Record</h2>
-        <div>
-          <p>Welcome, Admin</p>
-          <div id="clock" class="modern-clock"></div>
+        <div class="topbar-right">
+          <div class="welcome-clock">
+            <p class="welcome-admin">Welcome, Admin</p>
+            <div id="clock" class="modern-clock"></div>
+          </div>
         </div>
       </div>
       <div id="content">
@@ -626,7 +798,7 @@
     // Sub-menu navigation
     document.querySelectorAll(".sub-btn").forEach(subBtn => {
       subBtn.addEventListener("click", (e) => {
-        e.stopPropagation(); // Prevent parent li click
+        e.stopPropagation();
 
         // Remove active from all sub-menu items
         document.querySelectorAll(".sub-btn.active").forEach(btn => btn.classList.remove("active"));
@@ -644,24 +816,159 @@
         // Set dynamic page title for sub-menu
         let subPage = subBtn.getAttribute("data-page");
         let title = "";
-        if (subPage === "employee") title = "Employee";
-        else if (subPage === "attendance") title = "Attendance";
-        else if (subPage === "fines") title = "Fines";
-        else if (subPage === "penalties") title = "Penalties";
-        else if (subPage === "advances") title = "Advances";
-        else if (subPage === "loans") title = "Loans";
-        else if (subPage === "payroll") title = "Payroll";
+        let pageContent = "";
+        if (subPage === "employee") {
+          title = "Employee";
+          pageContent = `
+        <div class="employee-page">
+          <div class="employee-header">
+            <button class="add-employee-btn" id="addEmployeeBtn">+ Add New Employee</button>
+            <input type="text" id="employeeSearch" class="employee-search" placeholder="Search employee...">
+          </div>
+          <div class="employee-list" id="employeeList"></div>
+        </div>
+        <div class="modal" id="employeeModal" style="display:none;">
+          <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h3>Add New Employee</h3>
+            <form id="employeeForm">
+              <label for="empName">Employee Name</label>
+              <input type="text" id="empName" name="name" placeholder="Employee Name" required>
+              <label for="empDesignation">Designation</label>
+              <input type="text" id="empDesignation" name="designation" placeholder="Designation" required>
+              <label for="empJoining">Date of Joining</label>
+              <input type="date" id="empJoining" name="joining" placeholder="Date of Joining" required>
+              <label for="empPhone">Phone Number</label>
+              <input type="text" id="empPhone" name="phone" placeholder="Phone Number" required>
+              <label for="empEmail">Email Address</label>
+              <input type="email" id="empEmail" name="email" placeholder="Email Address" required>
+              <label for="empAddress">Home Address</label>
+              <input type="text" id="empAddress" name="address" placeholder="Home Address" required>
+              <label for="empDob">Date of Birth</label>
+              <input type="date" id="empDob" name="dob" placeholder="Date of Birth" required>
+              <label for="empSalary">Salary</label>
+              <input type="number" id="empSalary" name="salary" placeholder="Salary" required>
+              <label for="empProbation">Probation Period</label>
+              <select id="empProbation" name="probation" required>
+                <option value="">Probation Period</option>
+                <option value="1 Month">1 Month</option>
+                <option value="2 Months">2 Months</option>
+                <option value="3 Months">3 Months</option>
+              </select>
+              <label for="empRep">Reference</label>
+              <input type="text" id="empRep" name="Reference" placeholder="Reference" required>
+              <button type="submit">Add Employee</button>
+            </form>
+          </div>
+        </div>
+      `;
+        } else if (subPage === "attendance") {
+          title = "Attendance";
+          pageContent = pages["attendance"];
+        } else if (subPage === "fines") {
+          title = "Fines";
+          pageContent = pages["fines"];
+        } else if (subPage === "penalties") {
+          title = "Penalties";
+          pageContent = pages["penalties"];
+        } else if (subPage === "advances") {
+          title = "Advances";
+          pageContent = pages["advances"];
+        } else if (subPage === "loans") {
+          title = "Loans";
+          pageContent = pages["loans"];
+        } else if (subPage === "payroll") {
+          title = "Payroll";
+          pageContent = pages["payroll"];
+        }
 
         // Fade out current content
         content.classList.add("fade-content-out");
         setTimeout(() => {
           pageTitle.textContent = title;
-          content.innerHTML = `<div class="card">${pages[subPage]}</div>`;
+          content.innerHTML = `<div class="card">${pageContent}</div>`;
           content.classList.remove("fade-content-out");
           content.classList.add("fade-content-in");
           setTimeout(() => {
             content.classList.remove("fade-content-in");
           }, 400);
+
+          // Employee page logic (only if Employee page is shown)
+          if (subPage === "employee") {
+            let employees = [
+              {
+                name: "John Doe",
+                designation: "Manager",
+                joining: "2023-01-15",
+                phone: "9876543210",
+                email: "john@example.com",
+                address: "123 Main St",
+                dob: "1990-05-20",
+                salary: "50000",
+                probation: "2 Months"
+              }
+            ];
+
+            function renderEmployees(list) {
+              const employeeList = document.getElementById("employeeList");
+              if (!employeeList) return;
+              if (list.length === 0) {
+                employeeList.innerHTML = `<div style="color:#2575fc;">No employees found.</div>`;
+                return;
+              }
+              employeeList.innerHTML = list.map(emp => `
+            <div class="employee-card">
+              <strong>${emp.name}</strong>
+              <div>Designation: ${emp.designation}</div>
+              <div>Date of Joining: ${emp.joining}</div>
+              <div>Phone: ${emp.phone}</div>
+              <div>Email: ${emp.email}</div>
+              <div>Address: ${emp.address}</div>
+              <div>Date of Birth: ${emp.dob}</div>
+              <div>Salary: ${emp.salary}</div>
+              <div>Probation: ${emp.probation}</div>
+            </div>
+          `).join('');
+            }
+
+            // Show modal
+            document.getElementById("addEmployeeBtn").onclick = function () {
+              document.getElementById("employeeModal").style.display = "flex";
+            };
+            document.getElementById("closeModal").onclick = function () {
+              document.getElementById("employeeModal").style.display = "none";
+            };
+            document.getElementById("employeeModal").onclick = function (e) {
+              if (e.target.classList.contains("modal")) {
+                document.getElementById("employeeModal").style.display = "none";
+              }
+            };
+
+            // Add employee
+            document.getElementById("employeeForm").onsubmit = function (e) {
+              e.preventDefault();
+              const form = e.target;
+              const data = Object.fromEntries(new FormData(form).entries());
+              employees.push(data);
+              renderEmployees(employees);
+              document.getElementById("employeeModal").style.display = "none";
+              form.reset();
+            };
+
+            // Search employee
+            document.getElementById("employeeSearch").oninput = function (e) {
+              const val = e.target.value.toLowerCase();
+              const filtered = employees.filter(emp =>
+                emp.name.toLowerCase().includes(val) ||
+                emp.phone.toLowerCase().includes(val) ||
+                emp.email.toLowerCase().includes(val)
+              );
+              renderEmployees(filtered);
+            };
+
+            // Initial render
+            renderEmployees(employees);
+          }
         }, 400);
       });
     });
@@ -671,11 +978,20 @@
       const clock = document.getElementById("clock");
       if (clock) {
         const now = new Date();
-        // Show HH:MM:SS with leading zeros
-        const h = String(now.getHours()).padStart(2, '0');
-        const m = String(now.getMinutes()).padStart(2, '0');
-        const s = String(now.getSeconds()).padStart(2, '0');
-        clock.textContent = `${h}:${m}:${s}`;
+        // Format time in 12-hour format with AM/PM
+        let hours = now.getHours();
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // 0 should be 12
+        const timeStr = `${hours}:${minutes}:${seconds} ${ampm}`;
+
+        // Format date as Month Day, Year (e.g., Sep 3, 2025)
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        const dateStr = now.toLocaleDateString(undefined, options);
+
+        clock.textContent = `${dateStr} | ${timeStr}`;
       }
     }
     setInterval(updateClock, 1000);
