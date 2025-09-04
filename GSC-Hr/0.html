@@ -520,6 +520,8 @@
     }
 
     .modal-content button[type="submit"] {
+      display: block;
+      margin: 20px auto 0;
       background: linear-gradient(135deg, #2575fc, #6a11cb);
       color: #fff;
       border: none;
@@ -820,48 +822,61 @@
         if (subPage === "employee") {
           title = "Employee";
           pageContent = `
-        <div class="employee-page">
-          <div class="employee-header">
-            <button class="add-employee-btn" id="addEmployeeBtn">+ Add New Employee</button>
-            <input type="text" id="employeeSearch" class="employee-search" placeholder="Search employee...">
-          </div>
-          <div class="employee-list" id="employeeList"></div>
-        </div>
-        <div class="modal" id="employeeModal" style="display:none;">
-          <div class="modal-content">
-            <span class="close" id="closeModal">&times;</span>
-            <h3>Add New Employee</h3>
-            <form id="employeeForm">
-              <label for="empName">Employee Name</label>
-              <input type="text" id="empName" name="name" placeholder="Employee Name" required>
-              <label for="empDesignation">Designation</label>
-              <input type="text" id="empDesignation" name="designation" placeholder="Designation" required>
-              <label for="empJoining">Date of Joining</label>
-              <input type="date" id="empJoining" name="joining" placeholder="Date of Joining" required>
-              <label for="empPhone">Phone Number</label>
-              <input type="text" id="empPhone" name="phone" placeholder="Phone Number" required>
-              <label for="empEmail">Email Address</label>
-              <input type="email" id="empEmail" name="email" placeholder="Email Address" required>
-              <label for="empAddress">Home Address</label>
-              <input type="text" id="empAddress" name="address" placeholder="Home Address" required>
-              <label for="empDob">Date of Birth</label>
-              <input type="date" id="empDob" name="dob" placeholder="Date of Birth" required>
-              <label for="empSalary">Salary</label>
-              <input type="number" id="empSalary" name="salary" placeholder="Salary" required>
-              <label for="empProbation">Probation Period</label>
-              <select id="empProbation" name="probation" required>
-                <option value="">Probation Period</option>
-                <option value="1 Month">1 Month</option>
-                <option value="2 Months">2 Months</option>
-                <option value="3 Months">3 Months</option>
-              </select>
-              <label for="empRep">Reference</label>
-              <input type="text" id="empRep" name="Reference" placeholder="Reference" required>
-              <button type="submit">Add Employee</button>
-            </form>
-          </div>
-        </div>
-      `;
+    <div class="employee-page">
+      <div class="employee-header">
+        <button class="add-employee-btn" id="addEmployeeBtn">+ Add New Employee</button>
+        <input type="text" id="employeeSearch" class="employee-search" placeholder="Search employee...">
+      </div>
+      <div style="margin-bottom:18px; text-align:center;">
+        <button class="filter-btn" data-status="active" style="padding:8px 18px;margin:0 8px;border-radius:6px;background:#2575fc;color:#fff;border:none;cursor:pointer;">Active Employees</button>
+        <button class="filter-btn" data-status="resigned" style="padding:8px 18px;margin:0 8px;border-radius:6px;background:#f39c12;color:#fff;border:none;cursor:pointer;">Resigned Employees</button>
+        <button class="filter-btn" data-status="terminated" style="padding:8px 18px;margin:0 8px;border-radius:6px;background:#c0392b;color:#fff;border:none;cursor:pointer;">Terminated Employees</button>
+      </div>
+      <div class="employee-list" id="employeeList"></div>
+    </div>
+    <div class="modal" id="employeeModal" style="display:none;">
+      <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <h3>Add New Employee</h3>
+        <form id="employeeForm">
+          <label for="empName">Employee Name</label>
+          <input type="text" id="empName" name="name" placeholder="Employee Name" required>
+          <label for="empDesignation">Designation</label>
+          <input type="text" id="empDesignation" name="designation" placeholder="Designation" required>
+          <label for="empJoining">Date of Joining</label>
+          <input type="date" id="empJoining" name="joining" placeholder="Date of Joining" required>
+          <label for="empPhone">Phone Number</label>
+          <input type="text" id="empPhone" name="phone" placeholder="Phone Number" required>
+          <label for="empEmail">Email Address</label>
+          <input type="email" id="empEmail" name="email" placeholder="Email Address" required>
+          <label for="empAddress">Home Address</label>
+          <input type="text" id="empAddress" name="address" placeholder="Home Address" required>
+          <label for="empDob">Date of Birth</label>
+          <input type="date" id="empDob" name="dob" placeholder="Date of Birth" required>
+          <label for="empSalary">Salary</label>
+          <input type="number" id="empSalary" name="salary" placeholder="Salary" required>
+          <label for="empProbation">Probation Period</label>
+          <select id="empProbation" name="probation" required>
+            <option value="">Probation Period</option>
+            <option value="1 Month">1 Month</option>
+            <option value="2 Months">2 Months</option>
+            <option value="3 Months">3 Months</option>
+          </select>
+          <label for="empRep">Reference</label>
+          <input type="text" id="empRep" name="Reference" placeholder="Reference" required>
+          <button type="submit">Add Employee</button>
+        </form>
+      </div>
+    </div>
+    <!-- View Employee Modal -->
+    <div class="modal" id="viewEmployeeModal" style="display:none;">
+      <div class="modal-content" id="viewEmployeeContent">
+        <span class="close" id="closeViewModal">&times;</span>
+        <h3>Employee Details</h3>
+        <div id="employeeDetail"></div>
+      </div>
+    </div>
+  `;
         } else if (subPage === "attendance") {
           title = "Attendance";
           pageContent = pages["attendance"];
@@ -895,41 +910,85 @@
 
           // Employee page logic (only if Employee page is shown)
           if (subPage === "employee") {
-            let employees = [
-              {
-                name: "John Doe",
-                designation: "Manager",
-                joining: "2023-01-15",
-                phone: "9876543210",
-                email: "john@example.com",
-                address: "123 Main St",
-                dob: "1990-05-20",
-                salary: "50000",
-                probation: "2 Months"
-              }
-            ];
+            let employees = [];
+
+            let currentFilter = "active"; // Default filter
 
             function renderEmployees(list) {
               const employeeList = document.getElementById("employeeList");
               if (!employeeList) return;
+              let html = `
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:#2575fc;color:#fff;">
+          <th style="padding:8px;border:1px solid #eee;">S no</th>
+          <th style="padding:8px;border:1px solid #eee;">Name</th>
+          <th style="padding:8px;border:1px solid #eee;">Phone Number</th>
+          <th style="padding:8px;border:1px solid #eee;">Email</th>
+          <th style="padding:8px;border:1px solid #eee;">Salary</th>
+          <th style="padding:8px;border:1px solid #eee;">Status</th>
+          <th style="padding:8px;border:1px solid #eee;">View</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
               if (list.length === 0) {
-                employeeList.innerHTML = `<div style="color:#2575fc;">No employees found.</div>`;
-                return;
+                html += `
+      <tr>
+        <td colspan="7" style="text-align:center;padding:24px;color:#2575fc;">No employees found.</td>
+      </tr>
+    `;
+              } else {
+                html += list.map((emp, idx) => `
+      <tr>
+        <td style="padding:8px;border:1px solid #eee;">${idx + 1}</td>
+        <td style="padding:8px;border:1px solid #eee;">${emp.name}</td>
+        <td style="padding:8px;border:1px solid #eee;">${emp.phone}</td>
+        <td style="padding:8px;border:1px solid #eee;">${emp.email}</td>
+        <td style="padding:8px;border:1px solid #eee;">${emp.salary}</td>
+        <td style="padding:8px;border:1px solid #eee;">${emp.status || "Active"}</td>
+        <td style="padding:8px;border:1px solid #eee;">
+          <button class="view-employee-btn" data-idx="${employees.indexOf(emp)}" style="padding:4px 12px;border-radius:6px;background:#2575fc;color:#fff;border:none;cursor:pointer;">View</button>
+        </td>
+      </tr>
+    `).join('');
               }
-              employeeList.innerHTML = list.map(emp => `
-            <div class="employee-card">
-              <strong>${emp.name}</strong>
-              <div>Designation: ${emp.designation}</div>
-              <div>Date of Joining: ${emp.joining}</div>
-              <div>Phone: ${emp.phone}</div>
-              <div>Email: ${emp.email}</div>
-              <div>Address: ${emp.address}</div>
-              <div>Date of Birth: ${emp.dob}</div>
-              <div>Salary: ${emp.salary}</div>
-              <div>Probation: ${emp.probation}</div>
-            </div>
-          `).join('');
+              html += `</tbody></table>`;
+              employeeList.innerHTML = html;
+
+              // Attach view button events
+              document.querySelectorAll('.view-employee-btn').forEach(btn => {
+                btn.onclick = function () {
+                  const idx = btn.getAttribute('data-idx');
+                  showEmployeeDetail(employees[idx], idx);
+                };
+              });
             }
+
+            // Filter logic
+            function filterEmployees(status) {
+              currentFilter = status;
+              let filtered;
+              if (status === "active") {
+                filtered = employees.filter(emp => !emp.status || emp.status === "Active");
+              } else if (status === "resigned") {
+                filtered = employees.filter(emp => emp.status === "Resigned");
+              } else if (status === "terminated") {
+                filtered = employees.filter(emp => emp.status === "Terminated");
+              } else {
+                filtered = employees;
+              }
+              renderEmployees(filtered);
+            }
+
+            // Attach filter button events
+            setTimeout(() => {
+              document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.onclick = function () {
+                  filterEmployees(btn.getAttribute('data-status'));
+                };
+              });
+            }, 0);
 
             // Show modal
             document.getElementById("addEmployeeBtn").onclick = function () {
@@ -967,7 +1026,23 @@
             };
 
             // Initial render
-            renderEmployees(employees);
+            filterEmployees(currentFilter);
+
+            // Attach close logic for view modal (after DOM is updated)
+            setTimeout(() => {
+              const closeViewBtn = document.getElementById("closeViewModal");
+              const viewModal = document.getElementById("viewEmployeeModal");
+              if (closeViewBtn && viewModal) {
+                closeViewBtn.onclick = function () {
+                  viewModal.style.display = "none";
+                };
+                viewModal.onclick = function (e) {
+                  if (e.target.classList.contains("modal")) {
+                    viewModal.style.display = "none";
+                  }
+                };
+              }
+            }, 0);
           }
         }, 400);
       });
@@ -996,6 +1071,75 @@
     }
     setInterval(updateClock, 1000);
     updateClock();
+
+    // Show employee detail modal
+    function showEmployeeDetail(emp, idx) {
+      const modal = document.getElementById("viewEmployeeModal");
+      const detail = document.getElementById("employeeDetail");
+      if (!modal || !detail) return;
+      detail.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;">
+      <tr><td><strong>Name:</strong></td><td>${emp.name}</td></tr>
+      <tr><td><strong>Designation:</strong></td><td>${emp.designation}</td></tr>
+      <tr><td><strong>Date of Joining:</strong></td><td>${emp.joining}</td></tr>
+      <tr><td><strong>Phone Number:</strong></td><td>${emp.phone}</td></tr>
+      <tr><td><strong>Email:</strong></td><td>${emp.email}</td></tr>
+      <tr><td><strong>Home Address:</strong></td><td>${emp.address}</td></tr>
+      <tr><td><strong>Date of Birth:</strong></td><td>${emp.dob}</td></tr>
+      <tr><td><strong>Salary:</strong></td><td>${emp.salary}</td></tr>
+      <tr><td><strong>Probation Period:</strong></td><td>${emp.probation}</td></tr>
+      <tr><td><strong>Reference:</strong></td><td>${emp.Reference || ""}</td></tr>
+      <tr><td><strong>Status:</strong></td><td>${emp.status || "Active"}</td></tr>
+    </table>
+    <div style="margin-top:18px; text-align:center;">
+      <button id="deleteEmployeeBtn" style="padding:8px 18px;margin:0 8px;border-radius:6px;background:#e74c3c;color:#fff;border:none;cursor:pointer;" ${emp.status ? "disabled" : ""}>Delete</button>
+      <button id="resignEmployeeBtn" style="padding:8px 18px;margin:0 8px;border-radius:6px;background:#f39c12;color:#fff;border:none;cursor:pointer;" ${emp.status ? "disabled" : ""}>Resign</button>
+      <button id="terminateEmployeeBtn" style="padding:8px 18px;margin:0 8px;border-radius:6px;background:#c0392b;color:#fff;border:none;cursor:pointer;" ${emp.status ? "disabled" : ""}>Terminate</button>
+      <button id="activeEmployeeBtn" style="padding:8px 18px;margin:0 8px;border-radius:6px;background:#27ae60;color:#fff;border:none;cursor:pointer;" ${!emp.status ? "disabled" : ""}>Active</button>
+    </div>
+  `;
+      modal.style.display = "flex";
+
+      // Button logic
+      document.getElementById("deleteEmployeeBtn").onclick = function () {
+        if (confirm("Are you sure you want to delete this employee?")) {
+          employees.splice(idx, 1);
+          modal.style.display = "none";
+          renderEmployees(employees);
+        }
+      };
+      document.getElementById("resignEmployeeBtn").onclick = function () {
+        if (!emp.status && confirm("Mark this employee as Resigned?")) {
+          emp.status = "Resigned";
+          modal.style.display = "none";
+          renderEmployees(employees);
+        }
+      };
+      document.getElementById("terminateEmployeeBtn").onclick = function () {
+        if (!emp.status && confirm("Mark this employee as Terminated?")) {
+          emp.status = "Terminated";
+          modal.style.display = "none";
+          renderEmployees(employees);
+        }
+      };
+      document.getElementById("activeEmployeeBtn").onclick = function () {
+        if (emp.status && confirm("Mark this employee as Active?")) {
+          emp.status = "";
+          modal.style.display = "none";
+          renderEmployees(employees);
+        }
+      };
+    }
+
+    // Modal close logic
+    document.getElementById("closeViewModal").onclick = function () {
+      document.getElementById("viewEmployeeModal").style.display = "none";
+    };
+    document.getElementById("viewEmployeeModal").onclick = function (e) {
+      if (e.target.classList.contains("modal")) {
+        document.getElementById("viewEmployeeModal").style.display = "none";
+      }
+    };
   </script>
 </body>
 
