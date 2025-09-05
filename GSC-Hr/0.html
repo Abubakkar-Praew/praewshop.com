@@ -486,21 +486,20 @@
       background: #fff;
       border-radius: 16px;
       padding: 30px 28px;
-      width: 95vw;
-      /* 80% of viewport width */
-      max-width: 950px;
-      /* Optional: limit max width */
+      width: 55vw;
+      /* Set width to 55% of viewport */
+      max-width: 60vw;
+      /* Prevent overflow */
+      min-width: 320px;
+      /* Minimum width for small screens */
       position: relative;
       box-shadow: 0 8px 32px rgba(37, 117, 252, 0.15);
       display: flex;
       flex-direction: column;
       gap: 14px;
       height: auto;
-      /* Height fits content */
       max-height: 90vh;
-      /* Prevent overflow on very small screens */
       overflow-y: auto;
-      /* Scroll if content is too tall */
     }
 
     .modal-content h3 {
@@ -864,7 +863,13 @@
           </select>
           <label for="empRep">Reference</label>
           <input type="text" id="empRep" name="Reference" placeholder="Reference" required>
-          <button type="submit">Add Employee</button>
+          <button type="submit" id="addEmployeeBtnForm">Add Employee</button>
+          <div id="updateBtnWrapper" style="display:none;justify-content:center;">
+            <button type="button" id="updateEmployeeBtnForm"
+              style="margin-top:10px;background:#27ae60;color:#fff;border:none;border-radius:5px;padding:1rem 24px;font-size:16px;font-weight:600;cursor:pointer;">
+              Update
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -911,8 +916,70 @@
           // Employee page logic (only if Employee page is shown)
           if (subPage === "employee") {
             let employees = [];
+            const SHEET_API = "https://script.google.com/macros/s/AKfycbz4ihvYtgbx44e_xqjRL57S7G7Z95amEkAD4HNZ3Sr3dcKJU-DmXBPrj7cAW3m0gNDNQw/exec";
+            let currentFilter = "active";
 
-            let currentFilter = "active"; // Default filter
+            // Fetch employees from Google Sheet
+            function fetchEmployees() {
+              fetch(SHEET_API)
+                .then(res => res.json())
+                .then(data => {
+                  employees = Array.isArray(data) ? data : [];
+                  filterEmployees(currentFilter);
+                });
+            }
+
+            // Add employee to Google Sheet
+            document.getElementById("employeeForm").onsubmit = function (e) {
+              e.preventDefault();
+              const form = e.target;
+              const data = Object.fromEntries(new FormData(form).entries());
+              fetch(SHEET_API, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+              })
+                .then(res => res.json())
+                .then(() => {
+                  fetchEmployees(); // Refresh list
+                  document.getElementById("employeeModal").style.display = "none";
+                  form.reset();
+                  document.getElementById("addEmployeeBtnForm").style.display = "block";
+                  document.getElementById("updateBtnWrapper").style.display = "none";
+                });
+            };
+
+            // Delete employee from Google Sheet (by email)
+            function deleteEmployeeFromSheet(emp) {
+              fetch(SHEET_API + "?action=delete&email=" + encodeURIComponent(emp.email), {
+                method: "GET"
+              }).then(() => fetchEmployees());
+            }
+
+            // Update employee in Google Sheet (by email)
+            function updateEmployeeInSheet(emp, data) {
+              fetch(SHEET_API + "?action=update", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: emp.email, ...data })
+              }).then(() => fetchEmployees());
+            }
+
+            // Filter logic
+            function filterEmployees(status) {
+              currentFilter = status;
+              let filtered;
+              if (status === "active") {
+                filtered = employees.filter(emp => !emp.status || emp.status === "Active");
+              } else if (status === "resigned") {
+                filtered = employees.filter(emp => emp.status === "Resigned");
+              } else if (status === "terminated") {
+                filtered = employees.filter(emp => emp.status === "Terminated");
+              } else {
+                filtered = employees;
+              }
+              renderEmployees(filtered);
+            }
 
             function renderEmployees(list) {
               const employeeList = document.getElementById("employeeList");
@@ -965,22 +1032,6 @@
               });
             }
 
-            // Filter logic
-            function filterEmployees(status) {
-              currentFilter = status;
-              let filtered;
-              if (status === "active") {
-                filtered = employees.filter(emp => !emp.status || emp.status === "Active");
-              } else if (status === "resigned") {
-                filtered = employees.filter(emp => emp.status === "Resigned");
-              } else if (status === "terminated") {
-                filtered = employees.filter(emp => emp.status === "Terminated");
-              } else {
-                filtered = employees;
-              }
-              renderEmployees(filtered);
-            }
-
             // Attach filter button events
             setTimeout(() => {
               document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -993,6 +1044,9 @@
             // Show modal
             document.getElementById("addEmployeeBtn").onclick = function () {
               document.getElementById("employeeModal").style.display = "flex";
+              document.getElementById("addEmployeeBtnForm").style.display = "block";
+              document.getElementById("updateBtnWrapper").style.display = "none";
+              document.getElementById("employeeForm").reset();
             };
             document.getElementById("closeModal").onclick = function () {
               document.getElementById("employeeModal").style.display = "none";
@@ -1001,17 +1055,6 @@
               if (e.target.classList.contains("modal")) {
                 document.getElementById("employeeModal").style.display = "none";
               }
-            };
-
-            // Add employee
-            document.getElementById("employeeForm").onsubmit = function (e) {
-              e.preventDefault();
-              const form = e.target;
-              const data = Object.fromEntries(new FormData(form).entries());
-              employees.push(data);
-              renderEmployees(employees);
-              document.getElementById("employeeModal").style.display = "none";
-              form.reset();
             };
 
             // Search employee
@@ -1028,17 +1071,127 @@
             // Initial render
             filterEmployees(currentFilter);
 
-            // Attach close logic for view modal (after DOM is updated)
-            setTimeout(() => {
-              const closeViewBtn = document.getElementById("closeViewModal");
-              const viewModal = document.getElementById("viewEmployeeModal");
-              if (closeViewBtn && viewModal) {
-                closeViewBtn.onclick = function () {
-                  viewModal.style.display = "none";
+            // Show employee detail modal
+            window.showEmployeeDetail = function (emp, idx) {
+              const modal = document.getElementById("viewEmployeeModal");
+              const detail = document.getElementById("employeeDetail");
+              if (!modal || !detail) return;
+
+              // Determine status
+              const status = emp.status || "Active";
+              const isActive = status === "Active";
+              const isResigned = status === "Resigned";
+              const isTerminated = status === "Terminated";
+
+              // Move buttons to bottom
+              detail.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;margin-bottom:18px;">
+      <tr><td><strong>Name:</strong></td><td>${emp.name}</td></tr>
+      <tr><td><strong>Designation:</strong></td><td>${emp.designation}</td></tr>
+      <tr><td><strong>Date of Joining:</strong></td><td>${emp.joining}</td></tr>
+      <tr><td><strong>Phone Number:</strong></td><td>${emp.phone}</td></tr>
+      <tr><td><strong>Email:</strong></td><td>${emp.email}</td></tr>
+      <tr><td><strong>Home Address:</strong></td><td>${emp.address}</td></tr>
+      <tr><td><strong>Date of Birth:</strong></td><td>${emp.dob}</td></tr>
+      <tr><td><strong>Salary:</strong></td><td>${emp.salary}</td></tr>
+      <tr><td><strong>Probation Period:</strong></td><td>${emp.probation}</td></tr>
+      <tr><td><strong>Reference:</strong></td><td>${emp.Reference || ""}</td></tr>
+      <tr><td><strong>Status:</strong></td><td>${status}</td></tr>
+    </table>
+    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+      <button id="editEmployeeBtn" style="padding:6px 18px;border-radius:6px;background:#2575fc;color:#fff;border:none;cursor:pointer;font-size:15px;">Edit</button>
+      <button id="resignEmployeeBtn"
+        style="padding:6px 18px;border-radius:6px;background:#f39c12;color:#fff;border:none;cursor:pointer;font-size:15px;"
+        ${isResigned ? "disabled" : ""}>Resign</button>
+      <button id="terminateEmployeeBtn"
+        style="padding:6px 18px;border-radius:6px;background:#c0392b;color:#fff;border:none;cursor:pointer;font-size:15px;"
+        ${isTerminated ? "disabled" : ""}>Terminate</button>
+      <button id="activeEmployeeBtn"
+        style="padding:6px 18px;border-radius:6px;background:#27ae60;color:#fff;border:none;cursor:pointer;font-size:15px;"
+        ${isActive ? "disabled" : ""}>Active</button>
+      <button id="deleteEmployeeBtn"
+        style="padding:6px 18px;border-radius:6px;background:#e74c3c;color:#fff;border:none;cursor:pointer;font-size:15px;"
+        >Delete</button>
+    </div>
+  `;
+              modal.style.display = "flex";
+
+              // Button logic
+              document.getElementById("deleteEmployeeBtn").onclick = function () {
+                if (confirm("Are you sure you want to delete this employee?")) {
+                  deleteEmployeeFromSheet(emp);
+                  modal.style.display = "none";
+                }
+              };
+              document.getElementById("resignEmployeeBtn").onclick = function () {
+                if (!isResigned && confirm("Mark this employee as Resigned?")) {
+                  updateEmployeeInSheet(emp, { status: "Resigned" });
+                  modal.style.display = "none";
+                }
+              };
+              document.getElementById("terminateEmployeeBtn").onclick = function () {
+                if (!isTerminated && confirm("Mark this employee as Terminated?")) {
+                  updateEmployeeInSheet(emp, { status: "Terminated" });
+                  modal.style.display = "none";
+                }
+              };
+              document.getElementById("activeEmployeeBtn").onclick = function () {
+                if (!isActive && confirm("Mark this employee as Active?")) {
+                  updateEmployeeInSheet(emp, { status: "Active" });
+                  modal.style.display = "none";
+                }
+              };
+
+              // Edit button logic
+              document.getElementById("editEmployeeBtn").onclick = function () {
+                document.getElementById("employeeModal").style.display = "flex";
+                modal.style.display = "none";
+                // Fill the form with employee data
+                document.getElementById("empName").value = emp.name || "";
+                document.getElementById("empDesignation").value = emp.designation || "";
+                document.getElementById("empJoining").value = emp.joining || "";
+                document.getElementById("empPhone").value = emp.phone || "";
+                document.getElementById("empEmail").value = emp.email || "";
+                document.getElementById("empAddress").value = emp.address || "";
+                document.getElementById("empDob").value = emp.dob || "";
+                document.getElementById("empSalary").value = emp.salary || "";
+                document.getElementById("empProbation").value = emp.probation || "";
+                document.getElementById("empRep").value = emp.Reference || "";
+
+                // Show Update button, hide Add button
+                document.getElementById("addEmployeeBtnForm").style.display = "none";
+                document.getElementById("updateBtnWrapper").style.display = "flex";
+
+                // Remove previous event listeners
+                document.getElementById("updateEmployeeBtnForm").onclick = null;
+
+                // Update logic
+                document.getElementById("updateEmployeeBtnForm").onclick = function () {
+                  const form = document.getElementById("employeeForm");
+                  const data = Object.fromEntries(new FormData(form).entries());
+                  updateEmployeeInSheet(emp, data);
+                  document.getElementById("employeeModal").style.display = "none";
+                  form.reset();
+                  // Restore buttons
+                  document.getElementById("addEmployeeBtnForm").style.display = "block";
+                  document.getElementById("updateBtnWrapper").style.display = "none";
                 };
-                viewModal.onclick = function (e) {
+              };
+            }
+
+            // Modal close logic
+            setTimeout(() => {
+              const closeViewModalBtn = document.getElementById("closeViewModal");
+              if (closeViewModalBtn) {
+                closeViewModalBtn.onclick = function () {
+                  document.getElementById("viewEmployeeModal").style.display = "none";
+                };
+              }
+              const viewEmployeeModalDiv = document.getElementById("viewEmployeeModal");
+              if (viewEmployeeModalDiv) {
+                viewEmployeeModalDiv.onclick = function (e) {
                   if (e.target.classList.contains("modal")) {
-                    viewModal.style.display = "none";
+                    document.getElementById("viewEmployeeModal").style.display = "none";
                   }
                 };
               }
@@ -1077,8 +1230,16 @@
       const modal = document.getElementById("viewEmployeeModal");
       const detail = document.getElementById("employeeDetail");
       if (!modal || !detail) return;
+
+      // Determine status
+      const status = emp.status || "Active";
+      const isActive = status === "Active";
+      const isResigned = status === "Resigned";
+      const isTerminated = status === "Terminated";
+
+      // Move buttons to bottom
       detail.innerHTML = `
-    <table style="width:100%;border-collapse:collapse;">
+    <table style="width:100%;border-collapse:collapse;margin-bottom:18px;">
       <tr><td><strong>Name:</strong></td><td>${emp.name}</td></tr>
       <tr><td><strong>Designation:</strong></td><td>${emp.designation}</td></tr>
       <tr><td><strong>Date of Joining:</strong></td><td>${emp.joining}</td></tr>
@@ -1089,13 +1250,22 @@
       <tr><td><strong>Salary:</strong></td><td>${emp.salary}</td></tr>
       <tr><td><strong>Probation Period:</strong></td><td>${emp.probation}</td></tr>
       <tr><td><strong>Reference:</strong></td><td>${emp.Reference || ""}</td></tr>
-      <tr><td><strong>Status:</strong></td><td>${emp.status || "Active"}</td></tr>
+      <tr><td><strong>Status:</strong></td><td>${status}</td></tr>
     </table>
-    <div style="margin-top:18px; text-align:center;">
-      <button id="deleteEmployeeBtn" style="padding:8px 18px;margin:0 8px;border-radius:6px;background:#e74c3c;color:#fff;border:none;cursor:pointer;" ${emp.status ? "disabled" : ""}>Delete</button>
-      <button id="resignEmployeeBtn" style="padding:8px 18px;margin:0 8px;border-radius:6px;background:#f39c12;color:#fff;border:none;cursor:pointer;" ${emp.status ? "disabled" : ""}>Resign</button>
-      <button id="terminateEmployeeBtn" style="padding:8px 18px;margin:0 8px;border-radius:6px;background:#c0392b;color:#fff;border:none;cursor:pointer;" ${emp.status ? "disabled" : ""}>Terminate</button>
-      <button id="activeEmployeeBtn" style="padding:8px 18px;margin:0 8px;border-radius:6px;background:#27ae60;color:#fff;border:none;cursor:pointer;" ${!emp.status ? "disabled" : ""}>Active</button>
+    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+      <button id="editEmployeeBtn" style="padding:6px 18px;border-radius:6px;background:#2575fc;color:#fff;border:none;cursor:pointer;font-size:15px;">Edit</button>
+      <button id="resignEmployeeBtn"
+        style="padding:6px 18px;border-radius:6px;background:#f39c12;color:#fff;border:none;cursor:pointer;font-size:15px;"
+        ${isResigned ? "disabled" : ""}>Resign</button>
+      <button id="terminateEmployeeBtn"
+        style="padding:6px 18px;border-radius:6px;background:#c0392b;color:#fff;border:none;cursor:pointer;font-size:15px;"
+        ${isTerminated ? "disabled" : ""}>Terminate</button>
+      <button id="activeEmployeeBtn"
+        style="padding:6px 18px;border-radius:6px;background:#27ae60;color:#fff;border:none;cursor:pointer;font-size:15px;"
+        ${isActive ? "disabled" : ""}>Active</button>
+      <button id="deleteEmployeeBtn"
+        style="padding:6px 18px;border-radius:6px;background:#e74c3c;color:#fff;border:none;cursor:pointer;font-size:15px;"
+        >Delete</button>
     </div>
   `;
       modal.style.display = "flex";
@@ -1103,43 +1273,86 @@
       // Button logic
       document.getElementById("deleteEmployeeBtn").onclick = function () {
         if (confirm("Are you sure you want to delete this employee?")) {
-          employees.splice(idx, 1);
+          deleteEmployeeFromSheet(emp);
           modal.style.display = "none";
-          renderEmployees(employees);
         }
       };
       document.getElementById("resignEmployeeBtn").onclick = function () {
-        if (!emp.status && confirm("Mark this employee as Resigned?")) {
-          emp.status = "Resigned";
+        if (!isResigned && confirm("Mark this employee as Resigned?")) {
+          updateEmployeeInSheet(emp, { status: "Resigned" });
           modal.style.display = "none";
-          renderEmployees(employees);
         }
       };
       document.getElementById("terminateEmployeeBtn").onclick = function () {
-        if (!emp.status && confirm("Mark this employee as Terminated?")) {
-          emp.status = "Terminated";
+        if (!isTerminated && confirm("Mark this employee as Terminated?")) {
+          updateEmployeeInSheet(emp, { status: "Terminated" });
           modal.style.display = "none";
-          renderEmployees(employees);
         }
       };
       document.getElementById("activeEmployeeBtn").onclick = function () {
-        if (emp.status && confirm("Mark this employee as Active?")) {
-          emp.status = "";
+        if (!isActive && confirm("Mark this employee as Active?")) {
+          updateEmployeeInSheet(emp, { status: "Active" });
           modal.style.display = "none";
-          renderEmployees(employees);
         }
+      };
+
+      // Edit button logic
+      document.getElementById("editEmployeeBtn").onclick = function () {
+        document.getElementById("employeeModal").style.display = "flex";
+        modal.style.display = "none";
+        // Fill the form with employee data
+        document.getElementById("empName").value = emp.name || "";
+        document.getElementById("empDesignation").value = emp.designation || "";
+        document.getElementById("empJoining").value = emp.joining || "";
+        document.getElementById("empPhone").value = emp.phone || "";
+        document.getElementById("empEmail").value = emp.email || "";
+        document.getElementById("empAddress").value = emp.address || "";
+        document.getElementById("empDob").value = emp.dob || "";
+        document.getElementById("empSalary").value = emp.salary || "";
+        document.getElementById("empProbation").value = emp.probation || "";
+        document.getElementById("empRep").value = emp.Reference || "";
+
+        // Show Update button, hide Add button
+        document.getElementById("addEmployeeBtnForm").style.display = "none";
+        document.getElementById("updateBtnWrapper").style.display = "flex";
+
+        // Remove previous event listeners
+        document.getElementById("updateEmployeeBtnForm").onclick = null;
+
+        // Update logic
+        document.getElementById("updateEmployeeBtnForm").onclick = function () {
+          const form = document.getElementById("employeeForm");
+          const data = Object.fromEntries(new FormData(form).entries());
+          updateEmployeeInSheet(emp, data);
+          document.getElementById("employeeModal").style.display = "none";
+          form.reset();
+          // Restore buttons
+          document.getElementById("addEmployeeBtnForm").style.display = "block";
+          document.getElementById("updateBtnWrapper").style.display = "none";
+        };
       };
     }
 
     // Modal close logic
-    document.getElementById("closeViewModal").onclick = function () {
-      document.getElementById("viewEmployeeModal").style.display = "none";
-    };
-    document.getElementById("viewEmployeeModal").onclick = function (e) {
-      if (e.target.classList.contains("modal")) {
-        document.getElementById("viewEmployeeModal").style.display = "none";
+    setTimeout(() => {
+      const closeViewModalBtn = document.getElementById("closeViewModal");
+      if (closeViewModalBtn) {
+        closeViewModalBtn.onclick = function () {
+          document.getElementById("viewEmployeeModal").style.display = "none";
+        };
       }
-    };
+      const viewEmployeeModalDiv = document.getElementById("viewEmployeeModal");
+      if (viewEmployeeModalDiv) {
+        viewEmployeeModalDiv.onclick = function (e) {
+          if (e.target.classList.contains("modal")) {
+            document.getElementById("viewEmployeeModal").style.display = "none";
+          }
+        };
+      }
+    }, 0);
+
+    // Initial fetch
+    fetchEmployees();
   </script>
 </body>
 
